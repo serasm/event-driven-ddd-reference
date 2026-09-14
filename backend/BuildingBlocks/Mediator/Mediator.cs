@@ -9,7 +9,7 @@ public class Mediator : IMediator
 
     private readonly ConcurrentDictionary<Type, (Type QueryHandlerType, Delegate Invoker)>
         _queryHandlerInvokers = new();
-    private readonly ConcurrentDictionary<Type, (Type QueryHandlerType, Delegate Invoker)>
+    private readonly ConcurrentDictionary<Type, (Type CommandHandlerType, Delegate Invoker)>
         _commandHandlerInvokers = new();
 
     public Mediator(IServiceProvider serviceProvider)
