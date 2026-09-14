@@ -62,28 +62,33 @@ jobs:
           echo "Coverage: $percent%"
           echo "percent=$percent" >> "$GITHUB_OUTPUT"
         
-      - name: Generate pie chart SVG
-        env:
-          BRANCH: ${{ github.ref_name }}
-          PERCENT: ${{ steps.coverage.outputs.percent }}
+      - name: Generate coverage badge
         run: |
           mkdir -p docs
-          
-          cat <<EOF > docs/coverage-$BRANCH.svg
-          <svg width="200" height="200" viewBox="0 0 32 32">
-            <circle r="16" cx="16" cy="16" fill="#ddd"/>
-            <circle r="16" cx="16" cy="16"
-              fill="transparent"
-              stroke="#4caf50"
-              stroke-width="32"
-              stroke-dasharray="$PERCENT 100"
-              transform="rotate(-90 16 16)"/>
-            <text x="16" y="16"
-              font-size="8"
-              text-anchor="middle"
-              fill="#000">$PERCENT%</text>
+      
+          percent=$(jq -r '.summary.linecoverage' coverage/report/Summary.json)
+      
+          cat > "docs/coverage-${{ github.ref_name }}.svg" <<EOF
+          <svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" viewBox="0 0 130 20" role="img" aria-label="coverage: ${percent}%">
+            <title>coverage: ${percent}%</title>
+            <rect width="130" height="20" rx="3" fill="#555"/>
+            <rect x="70" width="60" height="20" rx="3" fill="#4c1"/>
+            <rect x="65" width="5" height="20" fill="#555"/>
+            <text x="35" y="14" fill="#fff" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-size="11">coverage</text>
+            <text x="100" y="14" fill="#fff" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-size="11">${percent}%</text>
           </svg>
           EOF
+
+      - name: Verify coverage badge
+        run: |
+          echo "=== Generated badge ==="
+          cat "docs/coverage-${{ github.ref_name }}.svg"
+      
+          echo "=== File ==="
+          file "docs/coverage-${{ github.ref_name }}.svg"
+      
+          echo "=== Files ==="
+          find docs -type f -print
       
       - name: Commit updated coverage badge
         run: |
