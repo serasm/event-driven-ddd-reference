@@ -2,8 +2,13 @@ name: PR Checks
 
 on:
   pull_request:
-    branches: [ main, dev ]
+    branches: [main, dev]
     types: [opened, synchronize, reopened]
+
+env:
+  UNIT_COVERAGE_THRESHOLD: 80
+  INTEGRATION_COVERAGE_THRESHOLD: 60
+  EXCLUDED_PROJECTS: "" # none yet
 
 jobs:
   build-and-test:
@@ -24,20 +29,70 @@ jobs:
       - name: Build
         run: dotnet build backend/EventDrivenDddReference.sln --configuration Release --no-restore
 
-      - name: Run tests with coverage threshold
+      - name: Run unit tests with per-project coverage threshold
         run: |
-          set -e
-          
-          find backend -name '*.Tests.csproj' -print0 |
+          set -e -o pipefail
+          IFS=',' read -ra EXCLUDED <<< "$EXCLUDED_PROJECTS"
+
+          is_excluded() {
+            local name="$1"
+            for excluded in "${EXCLUDED[@]}"; do
+              [[ "$name" == "$excluded" ]] && return 0
+            done
+            return 1
+          }
+
+          find backend -name '*.Tests.csproj' -not -name '*.IntegrationTests.csproj' -print0 |
             while IFS= read -r -d '' test_project; do
-              echo "Running tests for: $test_project"
-          
+              project_name=$(basename "$test_project" .Tests.csproj)
+
+              if is_excluded "$project_name"; then
+                echo "Skipping coverage threshold for $project_name (excluded)"
+                dotnet test "$test_project" --configuration Release --no-build
+                continue
+              fi
+
+              echo "Running unit tests for $project_name (threshold: ${UNIT_COVERAGE_THRESHOLD}%)"
               dotnet test "$test_project" \
                 --configuration Release \
                 --no-build \
                 /p:CollectCoverage=true \
                 /p:CoverletOutputFormat=cobertura \
-                /p:Threshold=80 \
+                /p:Threshold="$UNIT_COVERAGE_THRESHOLD" \
+                /p:ThresholdType=line \
+                /p:ThresholdStat=total
+            done
+
+      - name: Run integration tests with per-project coverage threshold
+        run: |
+          set -e -o pipefail
+          IFS=',' read -ra EXCLUDED <<< "$EXCLUDED_PROJECTS"
+
+          is_excluded() {
+            local name="$1"
+            for excluded in "${EXCLUDED[@]}"; do
+              [[ "$name" == "$excluded" ]] && return 0
+            done
+            return 1
+          }
+
+          find backend -name '*.IntegrationTests.csproj' -print0 |
+            while IFS= read -r -d '' test_project; do
+              project_name=$(basename "$test_project" .IntegrationTests.csproj)
+
+              if is_excluded "$project_name"; then
+                echo "Skipping coverage threshold for $project_name (excluded)"
+                dotnet test "$test_project" --configuration Release --no-build
+                continue
+              fi
+
+              echo "Running integration tests for $project_name (threshold: ${INTEGRATION_COVERAGE_THRESHOLD}%)"
+              dotnet test "$test_project" \
+                --configuration Release \
+                --no-build \
+                /p:CollectCoverage=true \
+                /p:CoverletOutputFormat=cobertura \
+                /p:Threshold="$INTEGRATION_COVERAGE_THRESHOLD" \
                 /p:ThresholdType=line \
                 /p:ThresholdStat=total
             done
