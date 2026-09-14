@@ -22,7 +22,8 @@ jobs:
     - run: dotnet build backend/EventDrivenDddReference.sln --configuration Release --no-restore
       
     - name: Run tests with coverage
-      run: dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-builc \
+      run: |
+          dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-build \
           /p:CollectCoverage=true \
           /p:CoverletOutput=coverage/ \
           /p:CoverletOutputFormat=\"json,cobertura\"

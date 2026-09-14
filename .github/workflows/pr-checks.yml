@@ -25,7 +25,8 @@ jobs:
         run: dotnet build backend/EventDrivenDddReference.sln --configuration Release --no-restore
 
       - name: Run tests with coverage threshold
-        run: dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-build \
+        run: |
+          dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-build \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=cobertura \
           /p:Threshold=80 \
