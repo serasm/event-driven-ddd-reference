@@ -27,7 +27,10 @@ jobs:
           
           mkdir -p coverage
           
-          find backend -name '*.Tests.csproj' -o -name '*.IntegrationTests.csproj' -print0 |
+          find backend \( \
+            -name '*.UnitTests.csproj' \
+            -o -name '*.IntegrationTests.csproj' \
+          ) -print0 |
             while IFS= read -r -d '' test_project; do
               echo "Running tests for: $test_project"
           
