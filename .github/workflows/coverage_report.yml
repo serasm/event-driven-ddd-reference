@@ -1,0 +1,55 @@
+name: Coverage Report
+
+on:
+  push:
+    branches: [dev, main]
+    
+permissions:
+  contents: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+  
+  steps:
+    - uses: actions/checkout@v7
+    
+    - uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: '10.0.x'
+    
+    - run: dotnet restore
+    - run: dotnet build --configuration Release --no-restore
+      
+    - name: Run tests with coverage
+      run: dotnet test --configuration Release --no-builc \
+          /p:CollectCoverage=true \
+          /p:CoverletOutput=coverage/ \
+          /p:CoverletOutputFormat=\"json,cobertura\"
+      
+    - name: Generate pie chart SVG
+      env:
+        BRANCH: ${{ github.ref_name }}
+      run: |
+        percent=$(jq '.linecoverage' coverage/coverage.json)
+        mkdir -p docs
+        cat <<EOF > docs/coverage-$BRANCH.svg
+        <svg width="200" height="200" viewBox="0 0 32 32">
+          <circle r="16" cx="16" cy="16" fill="#ddd"/>
+          <circle r="16" cx="16" cy="16"
+            fill="transparent"
+            stroke="#4caf50"
+            stroke-width="32"
+            stroke-dasharray="$percent 100"
+            transform="rotate(-90 16 16)"/>
+          <text x="16" y="16" font-size="8" text-anchor="middle" fill="#000">$percent%</text>
+        </svg>
+        EOF
+    
+    - name: Commit updated coverage badge
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add docs/coverage-${{ github.ref_name }}.svg
+        git commit -m "Update coverage badge [skip ci]" || echo "No changes"
+        git push
