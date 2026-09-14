@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Mediator.Tests.Helpers;
+namespace Mediator.UnitTests.Helpers;
 
 public static class MediatorCacheHelper
 {

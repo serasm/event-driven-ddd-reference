@@ -2,13 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator", "BuildingBlocks\Mediator\Mediator.csproj", "{9DBF2AB4-2513-4EE0-AD07-A6D878B534FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.Tests", "Tests\BuildingBlocks\Mediator.Tests\Mediator.Tests.csproj", "{5B558879-7CCD-47F8-BC06-0648A57DB7AB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{96FA34A1-DDD6-4C8C-AF2B-9F8AFF8D0B8A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A4F20571-AF8A-401B-AC91-CA3609BAF63F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{772F2102-4BFB-4462-82D0-9D3156A3CB5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.UnitTests", "Tests\BuildingBlocks\Mediator.UnitTests\Mediator.UnitTests.csproj", "{B02A4698-7EFC-4265-A40A-5CF4F454937C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,14 +20,14 @@ Global
 		{9DBF2AB4-2513-4EE0-AD07-A6D878B534FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DBF2AB4-2513-4EE0-AD07-A6D878B534FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DBF2AB4-2513-4EE0-AD07-A6D878B534FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5B558879-7CCD-47F8-BC06-0648A57DB7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B558879-7CCD-47F8-BC06-0648A57DB7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B558879-7CCD-47F8-BC06-0648A57DB7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B558879-7CCD-47F8-BC06-0648A57DB7AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B02A4698-7EFC-4265-A40A-5CF4F454937C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B02A4698-7EFC-4265-A40A-5CF4F454937C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B02A4698-7EFC-4265-A40A-5CF4F454937C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B02A4698-7EFC-4265-A40A-5CF4F454937C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9DBF2AB4-2513-4EE0-AD07-A6D878B534FF} = {96FA34A1-DDD6-4C8C-AF2B-9F8AFF8D0B8A}
 		{772F2102-4BFB-4462-82D0-9D3156A3CB5A} = {A4F20571-AF8A-401B-AC91-CA3609BAF63F}
-		{5B558879-7CCD-47F8-BC06-0648A57DB7AB} = {772F2102-4BFB-4462-82D0-9D3156A3CB5A}
+		{B02A4698-7EFC-4265-A40A-5CF4F454937C} = {772F2102-4BFB-4462-82D0-9D3156A3CB5A}
 	EndGlobalSection
 EndGlobal

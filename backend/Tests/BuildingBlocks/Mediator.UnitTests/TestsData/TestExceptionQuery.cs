@@ -1,4 +1,4 @@
-namespace Mediator.Tests;
+namespace Mediator.UnitTests;
 
 public sealed record TestExceptionQuery(int value) : IQuery<int>;
 
