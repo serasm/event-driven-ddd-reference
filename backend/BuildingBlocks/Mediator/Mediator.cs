@@ -23,7 +23,7 @@ public class Mediator : IMediator
     public Task<TResponse> SendAsync<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default)
     {
         var requestType = query.GetType();
-        var (handlerType, invokerObj) = _queryHandlerInvokers.GetOrAdd(requestType, rt => BuildQueryHandlerInfo<TResponse>(requestType));
+        var (handlerType, invokerObj) = _queryHandlerInvokers.GetOrAdd(requestType, BuildQueryHandlerInfo<TResponse>);
         
         var invoker = (Func<object, IQuery<TResponse>, CancellationToken, Task<TResponse>>)invokerObj;
         
@@ -36,7 +36,7 @@ public class Mediator : IMediator
     public Task SendAsync(ICommand command, CancellationToken cancellationToken = default)
     {
         var requestType = command.GetType();
-        var (handlerType, invokerObj) = _commandHandlerInvokers.GetOrAdd(requestType, rt => BuildCommandHandlerInfo(requestType));
+        var (handlerType, invokerObj) = _commandHandlerInvokers.GetOrAdd(requestType, BuildCommandHandlerInfo);
         
         var invoker = (Func<object, ICommand, CancellationToken, Task>)invokerObj;
         
