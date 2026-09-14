@@ -1,13 +1,8 @@
-<svg width="200" height="200" viewBox="0 0 32 32">
-  <circle r="16" cx="16" cy="16" fill="#ddd"/>
-  <circle r="16" cx="16" cy="16"
-    fill="transparent"
-    stroke="#4caf50"
-    stroke-width="32"
-    stroke-dasharray="98 100"
-    transform="rotate(-90 16 16)"/>
-  <text x="16" y="16"
-    font-size="8"
-    text-anchor="middle"
-    fill="#000">98%</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" viewBox="0 0 130 20" role="img" aria-label="coverage: 98%">
+  <title>coverage: 98%</title>
+  <rect width="130" height="20" rx="3" fill="#555"/>
+  <rect x="70" width="60" height="20" rx="3" fill="#4c1"/>
+  <rect x="65" width="5" height="20" fill="#555"/>
+  <text x="35" y="14" fill="#fff" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-size="11">coverage</text>
+  <text x="100" y="14" fill="#fff" text-anchor="middle" font-family="Verdana, Geneva, sans-serif" font-size="11">98%</text>
 </svg>
