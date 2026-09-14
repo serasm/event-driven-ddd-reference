@@ -1,0 +1,93 @@
+## ---------------------------------------------------------------------------
+## .NET / C# build artifacts
+## ---------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+[Ll]og/
+[Ll]ogs/
+out/
+artifacts/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Publish / deployment output
+[Pp]ublish/
+*.[Pp]ublish.xml
+*.pubxml
+*.pubxml.user
+*.azurePubxml
+PublishScripts/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+
+## ---------------------------------------------------------------------------
+## JetBrains Rider / ReSharper
+## ---------------------------------------------------------------------------
+.idea/
+*.sln.iml
+*.iml
+cmake-build-*/
+
+# ReSharper (bundled with Rider)
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+*.DotSettings.user
+
+## ---------------------------------------------------------------------------
+## Visual Studio (in case the solution is ever opened there too)
+## ---------------------------------------------------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## ---------------------------------------------------------------------------
+## Test results / coverage
+## ---------------------------------------------------------------------------
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coverage.*.xml
+.testcontainers/
+
+## ---------------------------------------------------------------------------
+## Configuration / secrets (do not commit real values)
+## ---------------------------------------------------------------------------
+appsettings.*.local.json
+appsettings.Development.json
+secrets.json
+*.env
+.env
+.env.*
+
+## ---------------------------------------------------------------------------
+## Docker
+## ---------------------------------------------------------------------------
+docker-compose.override.yml
+
+## ---------------------------------------------------------------------------
+## OS / editor noise
+## ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
