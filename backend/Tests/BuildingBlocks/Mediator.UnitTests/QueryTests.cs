@@ -1,8 +1,8 @@
-using Mediator.Tests.Helpers;
-using Mediator.Tests.Inheritance;
+using Mediator.UnitTests.Helpers;
+using Mediator.UnitTests.Inheritance;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.Tests;
+namespace Mediator.UnitTests;
 
 public class QueryTests
 {

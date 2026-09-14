@@ -1,4 +1,4 @@
-namespace Mediator.Tests.Inheritance;
+namespace Mediator.UnitTests.Inheritance;
 
 public abstract record BaseQuery(int value) : IQuery<int>;
 

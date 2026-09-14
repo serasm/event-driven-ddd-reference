@@ -1,4 +1,4 @@
-namespace Mediator.Tests.Inheritance;
+namespace Mediator.UnitTests.Inheritance;
 
 public sealed record ConcreteQuery(int value) : BaseQuery(value);
 
