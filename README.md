@@ -2,4 +2,4 @@
 
 | Branch | Coverage |
 |---|---|
-| `dev` | ![dev coverage](./docs/coverage-dev.svg) |
+| `dev` | ![dev coverage](docs/coverage-dev.svg) |
