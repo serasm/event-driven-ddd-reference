@@ -23,17 +23,48 @@ jobs:
       
     - name: Run tests with coverage
       run: |
-          dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-build \
-          /p:CollectCoverage=true \
-          /p:CoverletOutput=coverage/ \
-          /p:CoverletOutputFormat=\"json,cobertura\"
+        set -e
+        
+        mkdir -p coverage
+        
+        find backend -name '*.Tests.csproj' -print0 |
+          while IFS= read -r -d '' test_project; do
+            echo "Running tests for: $test_project"
+        
+            project_name=$(basename "$test_project" .Tests.csproj)
+        
+            dotnet test "$test_project" \
+              --configuration Release \
+              --no-build \
+              /p:CollectCoverage=true \
+              /p:CoverletOutput="$GITHUB_WORKSPACE/coverage/$project_name/" \
+              /p:CoverletOutputFormat="json,cobertura"
+          done
+      
+    - name: Install ReportGenerator
+      run: dotnet tool install --global dotnet-reportgenerator-globaltool
+      
+    - name: Generate combined coverage report
+      run: |
+        reportgenerator \
+          "-reports:$GITHUB_WORKSPACE/coverage/**/*.cobertura.xml" \
+          "-targetdir:$GITHUB_WORKSPACE/coverage/report" \
+          "-reporttypes:JsonSummary;Html;Cobertura"
+      
+    - name: Read total coverage
+      id: coverage
+      run: |
+        percent=$(jq -r '.summary.linecoverage' coverage/report/Summary.json)
+        echo "Coverage: $percent%"
+        echo "percent=$percent" >> "$GITHUB_OUTPUT"
       
     - name: Generate pie chart SVG
       env:
         BRANCH: ${{ github.ref_name }}
+        PERCENT: ${{ steps.coverage.outputs.percent }}
       run: |
-        percent=$(jq '.linecoverage' coverage/coverage.json)
         mkdir -p docs
+        
         cat <<EOF > docs/coverage-$BRANCH.svg
         <svg width="200" height="200" viewBox="0 0 32 32">
           <circle r="16" cx="16" cy="16" fill="#ddd"/>
@@ -41,9 +72,12 @@ jobs:
             fill="transparent"
             stroke="#4caf50"
             stroke-width="32"
-            stroke-dasharray="$percent 100"
+            stroke-dasharray="$PERCENT 100"
             transform="rotate(-90 16 16)"/>
-          <text x="16" y="16" font-size="8" text-anchor="middle" fill="#000">$percent%</text>
+          <text x="16" y="16"
+            font-size="8"
+            text-anchor="middle"
+            fill="#000">$PERCENT%</text>
         </svg>
         EOF
     
