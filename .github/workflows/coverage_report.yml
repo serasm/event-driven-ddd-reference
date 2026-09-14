@@ -38,8 +38,12 @@ jobs:
                 --no-build \
                 /p:CollectCoverage=true \
                 /p:CoverletOutput="$GITHUB_WORKSPACE/coverage/$project_name/" \
-                /p:CoverletOutputFormat="json%3Bcobertura"
+                /p:CoverletOutputFormat="cobertura"
             done
+
+      - name: Show coverage files
+        run: |
+          find "$GITHUB_WORKSPACE/coverage" -type f -print
         
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -47,7 +51,7 @@ jobs:
       - name: Generate combined coverage report
         run: |
           reportgenerator \
-            "-reports:$GITHUB_WORKSPACE/coverage/**/*.cobertura.xml" \
+            "-reports:$GITHUB_WORKSPACE/coverage/**/*.xml" \
             "-targetdir:$GITHUB_WORKSPACE/coverage/report" \
             "-reporttypes:JsonSummary;Html;Cobertura"
         
