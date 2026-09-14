@@ -18,11 +18,11 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     
-    - run: dotnet restore
-    - run: dotnet build --configuration Release --no-restore
+    - run: dotnet restore backend/EventDrivenDddReference.sln
+    - run: dotnet build backend/EventDrivenDddReference.sln --configuration Release --no-restore
       
     - name: Run tests with coverage
-      run: dotnet test --configuration Release --no-builc \
+      run: dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-builc \
           /p:CollectCoverage=true \
           /p:CoverletOutput=coverage/ \
           /p:CoverletOutputFormat=\"json,cobertura\"
