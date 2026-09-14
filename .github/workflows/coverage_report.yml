@@ -96,25 +96,6 @@ jobs:
           fi
       
           echo "SVG looks valid"
-
-      - name: Validate SVG
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-      
-          path = Path("docs/coverage-${{ github.ref_name }}.svg")
-          data = path.read_text()
-      
-          print(repr(data))
-      
-          if "\\<" in data:
-              raise SystemExit("ERROR: SVG contains literal \\\\<")
-      
-          if not data.lstrip().startswith("<svg"):
-              raise SystemExit("ERROR: SVG does not start with <svg")
-      
-          print("SVG content is valid")
-          PY
       
       - name: Commit updated coverage badge
         run: |
@@ -132,4 +113,3 @@ jobs:
       
           git pull --rebase origin "${{ github.ref_name }}"
           git push origin "HEAD:${{ github.ref_name }}"
-                git push
