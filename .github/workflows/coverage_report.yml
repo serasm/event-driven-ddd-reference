@@ -89,6 +89,16 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+      
           git add docs/coverage-${{ github.ref_name }}.svg
-          git commit -m "Update coverage badge [skip ci]" || echo "No changes"
-          git push
+      
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+      
+          git commit -m "Update coverage badge [skip ci]"
+      
+          git pull --rebase origin "${{ github.ref_name }}"
+          git push origin "HEAD:${{ github.ref_name }}"
+                git push
