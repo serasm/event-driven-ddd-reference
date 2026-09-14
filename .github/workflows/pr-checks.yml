@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup .NET 10
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
 
@@ -26,9 +26,18 @@ jobs:
 
       - name: Run tests with coverage threshold
         run: |
-          dotnet test backend/EventDrivenDddReference.sln --configuration Release --no-build \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=cobertura \
-          /p:Threshold=80 \
-          /p:ThresholdType=line \
-          /p:ThresholdStat=total
+          set -e
+          
+          find backend -name '*.Tests.csproj' -print0 |
+            while IFS= read -r -d '' test_project; do
+              echo "Running tests for: $test_project"
+          
+              dotnet test "$test_project" \
+                --configuration Release \
+                --no-build \
+                /p:CollectCoverage=true \
+                /p:CoverletOutputFormat=cobertura \
+                /p:Threshold=80 \
+                /p:ThresholdType=line \
+                /p:ThresholdStat=total
+            done
