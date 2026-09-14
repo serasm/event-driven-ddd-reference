@@ -42,9 +42,9 @@ jobs:
             return 1
           }
 
-          find backend -name '*.Tests.csproj' -not -name '*.IntegrationTests.csproj' -print0 |
+          find backend -name '*.UnitTests.csproj' -not -name '*.IntegrationTests.csproj' -print0 |
             while IFS= read -r -d '' test_project; do
-              project_name=$(basename "$test_project" .Tests.csproj)
+              project_name=$(basename "$test_project" .UnitTests.csproj)
 
               if is_excluded "$project_name"; then
                 echo "Skipping coverage threshold for $project_name (excluded)"
