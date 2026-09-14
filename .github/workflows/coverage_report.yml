@@ -38,7 +38,7 @@ jobs:
                 --no-build \
                 /p:CollectCoverage=true \
                 /p:CoverletOutput="$GITHUB_WORKSPACE/coverage/$project_name/" \
-                /p:CoverletOutputFormat="json,cobertura"
+                /p:CoverletOutputFormat="json%3Bcobertura"
             done
         
       - name: Install ReportGenerator
