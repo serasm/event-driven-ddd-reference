@@ -84,11 +84,37 @@ jobs:
           echo "=== Generated badge ==="
           cat "docs/coverage-${{ github.ref_name }}.svg"
       
-          echo "=== File ==="
-          file "docs/coverage-${{ github.ref_name }}.svg"
+          echo "=== Checking SVG ==="
+          if grep -q '\\<' "docs/coverage-${{ github.ref_name }}.svg"; then
+            echo "ERROR: SVG contains escaped < characters"
+            exit 1
+          fi
       
-          echo "=== Files ==="
-          find docs -type f -print
+          if ! grep -q '^<svg' "docs/coverage-${{ github.ref_name }}.svg"; then
+            echo "ERROR: SVG does not start with <svg"
+            exit 1
+          fi
+      
+          echo "SVG looks valid"
+
+      - name: Validate SVG
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+      
+          path = Path("docs/coverage-${{ github.ref_name }}.svg")
+          data = path.read_text()
+      
+          print(repr(data))
+      
+          if "\\<" in data:
+              raise SystemExit("ERROR: SVG contains literal \\\\<")
+      
+          if not data.lstrip().startswith("<svg"):
+              raise SystemExit("ERROR: SVG does not start with <svg")
+      
+          print("SVG content is valid")
+          PY
       
       - name: Commit updated coverage badge
         run: |
