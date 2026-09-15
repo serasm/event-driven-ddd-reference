@@ -1,6 +1,6 @@
 using Mediator.Requests;
 
-namespace Mediator.UnitTests;
+namespace Mediator.UnitTests.Requests;
 
 public record BaseRequest(int value) : IRequest<int>;
 
