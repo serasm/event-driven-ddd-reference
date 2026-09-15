@@ -1,3 +1,4 @@
+using Mediator.Mediator;
 using Mediator.Pipelines;
 using Mediator.Requests;
 using Mediator.UnitTests.Pipelines;
@@ -21,7 +22,7 @@ public sealed class PipelineFactoryTests
 
         await using var provider = services.BuildServiceProvider();
 
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         var handlerInvoker =
             (object handler,
@@ -37,10 +38,12 @@ public sealed class PipelineFactoryTests
             handlerInvoker);
 
         var result = await ((Func<
+            IServiceProvider,
             object,
             IRequest<int>,
             CancellationToken,
             Task<int>>)pipeline)(
+                provider,
                 new object(),
                 new PipelineTestRequest(),
                 CancellationToken.None);
@@ -75,7 +78,7 @@ public sealed class PipelineFactoryTests
 
         await using var provider = services.BuildServiceProvider();
 
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         var handlerInvoker =
             (object handler,
@@ -91,10 +94,12 @@ public sealed class PipelineFactoryTests
             handlerInvoker);
 
         var result = await ((Func<
+            IServiceProvider,
             object,
             IRequest<int>,
             CancellationToken,
             Task<int>>)pipeline)(
+                provider,
                 new object(),
                 new PipelineTestRequest(),
                 CancellationToken.None);
@@ -122,7 +127,7 @@ public sealed class PipelineFactoryTests
 
         using var provider = services.BuildServiceProvider();
 
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         var handlerInvoker =
             (object handler,
@@ -138,10 +143,12 @@ public sealed class PipelineFactoryTests
             handlerInvoker);
 
         var result = await ((Func<
+            IServiceProvider,
             object,
             IRequest<int>,
             CancellationToken,
             Task<int>>)pipeline)(
+                provider,
                 new object(),
                 new PipelineTestRequest(),
                 CancellationToken.None);
@@ -156,7 +163,7 @@ public sealed class PipelineFactoryTests
         var services = new ServiceCollection();
         using var provider = services.BuildServiceProvider();
 
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         Func<object, IRequest<int>, CancellationToken, Task<int>> handlerInvoker =
             (handler, request, cancellationToken) =>
@@ -180,7 +187,7 @@ public sealed class PipelineFactoryTests
         
         using var provider = services.BuildServiceProvider();
 
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         Func<object, IRequest<int>, CancellationToken, Task<int>> firstInvoker =
             (handler, request, cancellationToken) =>
@@ -212,7 +219,7 @@ public sealed class PipelineFactoryTests
             ShortCircuitPipeline>();
 
         await using var provider = services.BuildServiceProvider();
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         var handlerInvoker =
             (object handler,
@@ -228,10 +235,12 @@ public sealed class PipelineFactoryTests
             handlerInvoker);
 
         var result = await ((Func<
+            IServiceProvider,
             object,
             IRequest<int>,
             CancellationToken,
             Task<int>>)pipeline)(
+                provider,
                 new object(),
                 new PipelineTestRequest(),
                 CancellationToken.None);
@@ -254,7 +263,7 @@ public sealed class PipelineFactoryTests
             CancellationTokenPipeline>();
 
         await using var provider = services.BuildServiceProvider();
-        var factory = new PipelineFactory(provider);
+        var factory = new PipelineFactory();
 
         var handlerInvoker =
             (object handler,
@@ -267,10 +276,12 @@ public sealed class PipelineFactoryTests
             handlerInvoker);
 
         var result = await ((Func<
+            IServiceProvider,
             object,
             IRequest<int>,
             CancellationToken,
             Task<int>>)pipeline)(
+                provider,
                 new object(),
                 new PipelineTestRequest(),
                 cts.Token);
@@ -306,7 +317,8 @@ public sealed class PipelineFactoryTests
             PipelineTestRequestHandler>();
 
         services.AddTransient<IPipelineFactory, PipelineFactory>();
-        services.AddScoped<IMediator, Mediator>();
+        services.AddScoped<IMediator, Mediator.Mediator>();
+        services.AddSingleton(new RequestHandlerInvokerCache());
 
         await using var provider = services.BuildServiceProvider();
 

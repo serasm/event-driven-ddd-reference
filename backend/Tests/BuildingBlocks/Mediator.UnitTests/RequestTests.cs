@@ -12,10 +12,11 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldCreateAndCacheInvoker()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         Assert.Empty(cache);
         
         var result = await mediator.SendAsync(new TestRequest(10));
@@ -36,14 +37,15 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldCreateWorkingInvoker()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         
         var mediatorResult = await mediator.SendAsync(new TestRequest(10));
         Assert.Equal(20, mediatorResult);
         
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         Assert.Single(cache);
         Assert.True(cache.ContainsKey(typeof(TestRequest)));   
         var entry = cache[typeof(TestRequest)];
@@ -64,12 +66,13 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldReuseCachedInvoker()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
 
         await mediator.SendAsync(new TestRequest(1));
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         var firstEntry = cache[typeof(TestRequest)];
 
         await mediator.SendAsync(new TestRequest(2));
@@ -83,6 +86,7 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldResolveHandlerUsingConcreteRuntimeType()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<
             IRequestHandler<ConcreteRequest, int>,
             ConcreteRequestHandler>();
@@ -90,13 +94,13 @@ public sealed class RequestTests
             IRequestHandler<BaseRequest, int>,
             BaseRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         BaseRequest Request = new ConcreteRequest(21);
 
         var result = await mediator.SendAsync(Request);
 
         Assert.Equal(42, result);
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         Assert.Single(cache);
         Assert.True(
             cache.ContainsKey(typeof(ConcreteRequest)));
@@ -112,8 +116,9 @@ public sealed class RequestTests
     public async Task SendAsync_ShouldThrownAnException_WhenThereIsNoRequestHandler()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         
         var result = await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.SendAsync(new TestRequest(10)));
         Assert.Contains("No handler registered for type ", result.Message);
@@ -123,11 +128,12 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldPassCancellationTokenToHandler()
     {
         var handler = new TestRequestHandler();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         var ct = new CancellationTokenSource();
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>>(handler);
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         
         var result = await mediator.SendAsync(new TestRequest(10), ct.Token);
         
@@ -138,15 +144,16 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldCacheInvokersSeparatelyForDifferentRequestTypes()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         services.AddSingleton<IRequestHandler<ConcreteRequest, int>, ConcreteRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         
         await mediator.SendAsync(new TestRequest(1));
         await mediator.SendAsync(new ConcreteRequest(2));
         
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         Assert.Equal(2, cache.Count);
         Assert.True(cache.ContainsKey(typeof(TestRequest)));
         Assert.True(cache.ContainsKey(typeof(ConcreteRequest)));
@@ -156,9 +163,10 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldPropagateHandlerException()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestExceptionRequest, int>, TestExceptionRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         
         var result = await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.SendAsync(new TestExceptionRequest(1)));
         
@@ -169,15 +177,16 @@ public sealed class RequestTests
     public async Task SendAsync_Request_ShouldHandleConcurrentFirstCalls()
     {
         var services = new ServiceCollection();
+        var requestHandlerInvokerCache = new RequestHandlerInvokerCache();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider, new PipelineFactory(provider));
+        var mediator = new Mediator.Mediator(provider, requestHandlerInvokerCache, new PipelineFactory());
         var tasks = Enumerable.Range(0, 100)
             .Select(i => mediator.SendAsync(new TestRequest(i), CancellationToken.None));
 
         await Task.WhenAll(tasks);
         
-        var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
+        var cache = MediatorCacheHelper.GetRequestHandlerCache(requestHandlerInvokerCache);
         Assert.Single(cache);
         Assert.True(cache.ContainsKey(typeof(TestRequest)));
     }

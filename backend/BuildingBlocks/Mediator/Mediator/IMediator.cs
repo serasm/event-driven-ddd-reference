@@ -1,6 +1,6 @@
 using Mediator.Requests;
 
-namespace Mediator;
+namespace Mediator.Mediator;
 
 public interface IMediator
 {

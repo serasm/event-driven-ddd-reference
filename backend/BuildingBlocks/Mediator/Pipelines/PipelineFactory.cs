@@ -8,7 +8,6 @@ namespace Mediator.Pipelines;
 
 public class PipelineFactory : IPipelineFactory
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly ConcurrentDictionary<(Type RequestType, Type ResponseType), Delegate> _cache = new();
     
     private static readonly MethodInfo BuildMethod = 
@@ -17,12 +16,6 @@ public class PipelineFactory : IPipelineFactory
                 nameof(Build),
                 BindingFlags.Instance | BindingFlags.NonPublic)
         ?? throw new InvalidOperationException("Method 'Build' not found");
-    
-    public PipelineFactory(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider
-            ?? throw new ArgumentNullException(nameof(serviceProvider));
-    }
     
     public Delegate GetOrAdd<TResponse>(
         Type requestType,
@@ -44,16 +37,16 @@ public class PipelineFactory : IPipelineFactory
         return (Delegate)method.Invoke(this, new object[] { handlerInvoker });
     }
 
-    private Func<object, IRequest<TResponse>, CancellationToken, Task<TResponse>> Build<TRequest, TResponse>(
+    private Func<IServiceProvider, object, IRequest<TResponse>, CancellationToken, Task<TResponse>> Build<TRequest, TResponse>(
         Func<object, IRequest<TResponse>, CancellationToken, Task<TResponse>> handlerInvoker)
         where TRequest : IRequest<TResponse>
     {
-        var pipelines = _serviceProvider
-            .GetServices<IPipelineBehavior<TRequest, TResponse>>()
-            .ToArray();
-
-        return (handlerObject, request, cancellationToken) =>
+        return (serviceProvider, handlerObject, request, cancellationToken) =>
         {
+            var pipelines = serviceProvider
+                .GetServices<IPipelineBehavior<TRequest, TResponse>>()
+                .ToArray();
+            
             Func<Task<TResponse>> next = async () =>
                 await handlerInvoker.Invoke(handlerObject, request, cancellationToken);
 
