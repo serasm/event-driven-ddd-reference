@@ -1,6 +1,6 @@
 using Mediator.Requests;
 
-namespace Mediator.UnitTests;
+namespace Mediator.UnitTests.Requests;
 
 public record ConcreteRequest(int value) : BaseRequest(value);
 

@@ -1,10 +1,12 @@
+using Mediator.Pipelines;
 using Mediator.Requests;
 using Mediator.UnitTests.Helpers;
+using Mediator.UnitTests.Requests;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.UnitTests;
 
-public class RequestTests
+public sealed class RequestTests
 {
     [Fact]
     public async Task SendAsync_Request_ShouldCreateAndCacheInvoker()
@@ -12,7 +14,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
         Assert.Empty(cache);
         
@@ -36,7 +38,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         
         var mediatorResult = await mediator.SendAsync(new TestRequest(10));
         Assert.Equal(20, mediatorResult);
@@ -64,7 +66,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
 
         await mediator.SendAsync(new TestRequest(1));
         var cache = MediatorCacheHelper.GetRequestHandlerCache(mediator);
@@ -88,7 +90,7 @@ public class RequestTests
             IRequestHandler<BaseRequest, int>,
             BaseRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         BaseRequest Request = new ConcreteRequest(21);
 
         var result = await mediator.SendAsync(Request);
@@ -111,7 +113,7 @@ public class RequestTests
     {
         var services = new ServiceCollection();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         
         var result = await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.SendAsync(new TestRequest(10)));
         Assert.Contains("No handler registered for type ", result.Message);
@@ -125,7 +127,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>>(handler);
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         
         var result = await mediator.SendAsync(new TestRequest(10), ct.Token);
         
@@ -139,7 +141,7 @@ public class RequestTests
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         services.AddSingleton<IRequestHandler<ConcreteRequest, int>, ConcreteRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         
         await mediator.SendAsync(new TestRequest(1));
         await mediator.SendAsync(new ConcreteRequest(2));
@@ -156,7 +158,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestExceptionRequest, int>, TestExceptionRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         
         var result = await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.SendAsync(new TestExceptionRequest(1)));
         
@@ -169,7 +171,7 @@ public class RequestTests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestHandler<TestRequest, int>, TestRequestHandler>();
         await using var provider = services.BuildServiceProvider();
-        var mediator = new Mediator(provider);
+        var mediator = new Mediator(provider, new PipelineFactory(provider));
         var tasks = Enumerable.Range(0, 100)
             .Select(i => mediator.SendAsync(new TestRequest(i), CancellationToken.None));
 
